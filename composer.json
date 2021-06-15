@@ -1,0 +1,66 @@
+{
+  "name": "bitterdev/professional_shop",
+  "description": "Starting point package to install a professional shop.",
+  "type": "project",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "ConcreteComposer\\" : "./src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ConcreteComposer\\" : "./tests"
+    }
+  },
+  "require": {
+    "composer/installers": "^1.3",
+    "concrete5/core": "8.5.5",
+    "concrete5/dependency-patches": "^1.4.0",
+    "bitterdev/bitter_shop_system": "dev-master"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.0",
+    "mockery/mockery": "^1.2"
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "extra": {
+    "allow-subpatches": [
+      "concrete5/dependency-patches"
+    ],
+    "branch-alias": {
+      "dev-8.x": "8.x-dev"
+    },
+    "installer-paths": {
+      "public/concrete": ["type:concrete5-core"],
+      "public/application/themes/{$name}": ["type:concrete5-theme"],
+      "public/packages/{$name}": ["type:concrete5-package"],
+      "public/application/blocks/{$name}": ["type:concrete5-block"]
+    }
+  },
+  "repositories": {
+    "bitter_shop_system": {
+      "type": "package",
+      "package": {
+        "name": "bitterdev/bitter_shop_system",
+        "version": "dev-master",
+        "source": {
+          "url": "git@github.com:bitterdev/bitter_shop_system.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system"
+    ],
+    "post-install-cmd": [
+      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system"
+    ]
+  }
+}

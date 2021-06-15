@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<concrete5-cif version="1.0">
+  <themes>
+      <theme handle="elemental" package="" activated="1"/>
+  </themes>
+  <packages>
+    <package handle="bitter_shop_system"/>
+  </packages>
+</concrete5-cif>

@@ -1,6 +1,4 @@
 <?xml version="1.0"?>
 <concrete5-cif version="1.0">
-  <packages>
-    <package handle="bitter_shop_system"/>
-  </packages>
+
 </concrete5-cif>

@@ -11,6 +11,7 @@
     "composer/installers": "dev-main",
     "concrete5/core": "8.5.5",
     "bitterdev/bitter_shop_system": "dev-master",
+    "bitterdev/bitter_theme": "dev-master",
     "setasign/fpdi": "^2.3",
     "setasign/fpdf": "^1.8",
     "sofort/sofortlib-php": "3.*",
@@ -50,14 +51,28 @@
           "reference": "master"
         }
       }
+    },
+    "bitter_theme": {
+      "type": "package",
+      "package": {
+        "name": "bitterdev/bitter_theme",
+        "version": "dev-master",
+        "source": {
+          "url": "git@github.com:bitterdev/bitter_theme.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
     }
   },
   "scripts": {
     "post-update-cmd": [
-      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system"
+      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system",
+      "ln -sf ../../vendor/bitterdev/bitter_theme public/packages/bitter_theme"
     ],
     "post-install-cmd": [
-      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system"
+      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system",
+      "ln -sf ../../vendor/bitterdev/bitter_theme public/packages/bitter_theme"
     ]
   }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cac8d20e545719644dfdb36cc48802fd",
+    "content-hash": "b1e7edc1e0232a56ac76361d5cf68664",
     "packages": [
         {
             "name": "anahkiasen/html-object",
@@ -58,6 +58,16 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:bitterdev/bitter_shop_system.git",
+                "reference": "master"
+            },
+            "type": "library"
+        },
+        {
+            "name": "bitterdev/bitter_theme",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:bitterdev/bitter_theme.git",
                 "reference": "master"
             },
             "type": "library"
@@ -9054,7 +9064,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "composer/installers": 20,
-        "bitterdev/bitter_shop_system": 20
+        "bitterdev/bitter_shop_system": 20,
+        "bitterdev/bitter_theme": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

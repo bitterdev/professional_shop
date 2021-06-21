@@ -84,7 +84,16 @@ jobs:
           mv build.zip ..
           cd ..
       
-      - name: Deploy to bitter.de
+      - name: Deploy package to bitter.de
         run: |
           curl -F "file=@build.zip" \
            https://www.bitter.de/api/v1/addons/update/${GITHUB_REPOSITORY}
+           
+      - name: Deploy demo site
+        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+        with:
+          server: hosting136920.a2e46.netcup.net
+          username: ${{ secrets.NETCUP_FTP_USERNAME }}
+          password: ${{ secrets.NETCUP_FTP_PASSWORD }}
+          local-dir: ./deploy_data/
+          server-dir: /

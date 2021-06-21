@@ -69,9 +69,9 @@ jobs:
           find deploy_data -name ".git" -type d -empty -delete
           find deploy_data -name ".htaccess" -delete
           rm -rf deploy_data/vendor
+          cd deploy_data/concrete
           
       - name: Install concrete5 dependencies
-        working-directory: ./deploy_data/concrete
         uses: php-actions/composer@v6
         with:
           php_version: 7.2
@@ -79,7 +79,7 @@ jobs:
       
       - name: Create ZIP archive
         run: |
-          cd deploy_data
+          cd ..
           zip -r build.zip ./*
           mv build.zip ..
           cd ..

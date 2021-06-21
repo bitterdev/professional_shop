@@ -84,7 +84,7 @@ jobs:
           mv build.zip ..
           cd ..
 
-      - name: Clean up
+      - name: Clean up 1
         run: |
           rm -rf deploy_data
       
@@ -94,7 +94,7 @@ jobs:
            https://www.bitter.de/api/v1/addons/update/${GITHUB_REPOSITORY}
            
 
-      - name: Clean up
+      - name: Clean up 2
         run: |
           mkdir demo_site
           mv build.zip demo_site/
@@ -105,7 +105,7 @@ jobs:
           server: hosting136920.a2e46.netcup.net
           username: ${{ secrets.NETCUP_FTP_USERNAME }}
           password: ${{ secrets.NETCUP_FTP_PASSWORD }}
-          local-dir: ./demo_site
+          local-dir: ./demo_site/
           server-dir: /
 
       - name: Extract ZIP archive on demo site

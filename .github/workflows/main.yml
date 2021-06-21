@@ -1,0 +1,89 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install project dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: 7.2
+          php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
+          ssh_key: ${{ secrets.ssh_key }}
+          ssh_key_pub: ${{ secrets.ssh_key_pub }}
+          
+      - name: Convert concrete5 installation
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php -r "if (hash_file('sha384', 'composer-setup.php') === '756890a4488ce9024fc62c56153228907f1545c228516cbf63f885e036d37e9a59d27d63f46af1d4d07ee0f76181c7d3') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+          php composer-setup.php
+          php -r "unlink('composer-setup.php');"
+          rm -rf deploy_data
+          mkdir deploy_data
+          cp -R public/* deploy_data/
+          cp -R vendor deploy_data/concrete/
+          rm -rf deploy_data/packages/*
+          mv deploy_data/concrete/vendor/bitterdev/* deploy_data/packages
+          cd deploy_data/packages
+          for f in *; do
+              if [ -d "$f" ]; then
+                  cd $f
+                  php ../../../composer.phar install
+                  cd ..
+              fi
+          done
+          cd ..
+          cd ..
+          cat << EOF > deploy_data/application/bootstrap/autoload.php
+          <?php
+
+          defined('C5_EXECUTE') or die('Access Denied.');
+
+          /*
+           * ----------------------------------------------------------------------------
+           * Load all composer autoload items.
+           * ----------------------------------------------------------------------------
+           */
+
+          // If the checker class is already provided, likely we have been included in a separate composer project
+          if (!class_exists(\DoctrineXml\Checker::class)) {
+              // Otherwise, lets try to load composer ourselves
+              if (!@include(DIR_BASE_CORE . '/' . DIRNAME_VENDOR . '/autoload.php')) {
+                  echo 'Third party libraries not installed. Make sure that composer has required libraries in the concrete/ directory.';
+                  die(1);
+              }
+          }
+          EOF
+          
+      - name: Clean up packge
+        run: |
+          rm -rf deploy_data/application/files/*
+          rm -rf deploy_data/application/config/generated_overrides/*
+          find deploy_data -name ".DS_Store" -delete
+          find deploy_data -name ".gitignore" -delete
+          find deploy_data -name ".git" -type d -empty -delete
+          find deploy_data -name ".htaccess" -delete
+          rm -rf deploy_data/vendor
+          
+      - name: Install concrete5 dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: 7.2
+          php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
+          working-directory: ./deploy_data/concrete
+      
+      - name: Create ZIP archive
+        run: |
+          cd deploy_data
+          zip -r build.zip ./*
+          mv build.zip ..
+          cd ..
+      
+      - name: Deploy to bitter.de
+        run: |
+          curl -F "file=@build.zip" \
+           https://www.bitter.de/api/v1/addons/update/${GITHUB_REPOSITORY}

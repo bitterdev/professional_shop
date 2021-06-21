@@ -8,6 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: nanasess/setup-php@master
+        with:
+          php-version: '7.2'
+          php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
 
       - name: Install project dependencies
         uses: php-actions/composer@v6
@@ -59,9 +63,6 @@ jobs:
               }
           }
           EOF
-          
-      - name: Clean up package
-        run: |
           rm -rf deploy_data/application/files/*
           rm -rf deploy_data/application/config/generated_overrides/*
           find deploy_data -name ".DS_Store" -delete
@@ -69,23 +70,12 @@ jobs:
           find deploy_data -name ".git" -type d -empty -delete
           find deploy_data -name ".htaccess" -delete
           rm -rf deploy_data/vendor
-          
-      - name: Install concrete5 dependencies
-        working-directory: ./deploy_data/concrete
-        uses: php-actions/composer@v6
-        with:
-          php_version: 7.3
-          php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
-      
-      - name: Create ZIP archive
-        run: |
-          cd deploy_data
+          cd deploy_data/concrete
+          php ../../composer.phar install
+          cd ..
           zip -r build.zip ./*
           mv build.zip ..
           cd ..
-
-      - name: Clean up 1
-        run: |
           rm -rf deploy_data
       
       - name: Deploy ZIP archive to bitter.de

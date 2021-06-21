@@ -83,17 +83,33 @@ jobs:
           zip -r build.zip ./*
           mv build.zip ..
           cd ..
+
+      - name: Clean up
+        run: |
+          rm -rf deploy_data
       
-      - name: Deploy package to bitter.de
+      - name: Deploy ZIP archive to bitter.de
         run: |
           curl -F "file=@build.zip" \
            https://www.bitter.de/api/v1/addons/update/${GITHUB_REPOSITORY}
            
-      - name: Deploy demo site
+      - name: Deploy ZIP archive to demo site
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
           server: hosting136920.a2e46.netcup.net
           username: ${{ secrets.NETCUP_FTP_USERNAME }}
           password: ${{ secrets.NETCUP_FTP_PASSWORD }}
-          local-dir: ./deploy_data/
+          local-dir: ./
           server-dir: /
+
+      - name: Extract ZIP archive on demo site
+        uses: appleboy/ssh-action@master
+        with:
+          host: "91.204.46.70"
+          username: "hosting136920"
+          key: ${{ secrets.NETCUP_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /professional-shop.demo.bitter.de
+            unzip build.zip
+            rm build.zip

@@ -107,5 +107,5 @@ jobs:
           port: 22
           script: |
             cd /professional-shop.demo.bitter.de
-            unzip build.zip
+            unzip -o build.zip
             rm build.zip

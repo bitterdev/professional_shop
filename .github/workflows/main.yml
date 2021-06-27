@@ -13,6 +13,11 @@ jobs:
           php-version: '7.2'
           php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
 
+      - name: Cancel running workflows
+        uses: everphone-gmbh/cancel-previous-workflows@v5
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          
       - name: Install project dependencies
         uses: php-actions/composer@v6
         with:
@@ -80,9 +85,12 @@ jobs:
       
       - name: Deploy ZIP archive to bitter.de
         run: |
-          curl -F "file=@build.zip" \
-           https://www.bitter.de/api/v1/addons/update/${GITHUB_REPOSITORY}
-           
+          curl -i -X POST -H "Content-Type: multipart/form-data" -F \
+            'data=@build.zip' \
+            http://bitter.local/index.php/api/v1/addons/update/professional_shop
+          curl -i -X POST -H "Content-Type: multipart/form-data" -F \
+            'data=@build.zip' \
+            http://bitter.local/index.php/api/v1/addons/update/professioneller_shop
 
       - name: Clean up 2
         run: |

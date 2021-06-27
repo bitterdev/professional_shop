@@ -13,10 +13,13 @@ jobs:
           php-version: '7.2'
           php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
 
-      - name: Cancel running workflows
-        uses: everphone-gmbh/cancel-previous-workflows@v5
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: "Cancel other workflows"
+        uses: potiuk/cancel-workflow-runs@master
+        with:
+          cancelMode: allDuplicates
+          cancelFutureDuplicates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflowFileName: main.yml
           
       - name: Install project dependencies
         uses: php-actions/composer@v6

@@ -9,7 +9,7 @@
     "vlucas/phpdotenv": "^2.4",
     "doctrine/dbal": "<2.11",
     "composer/installers": "dev-main",
-    "concrete5/core": "8.5.5",
+    "concrete5/core": "8.5.7",
     "bitterdev/bitter_shop_system": "dev-master",
     "bitterdev/bitter_theme": "dev-master",
     "setasign/fpdi": "^2.3",

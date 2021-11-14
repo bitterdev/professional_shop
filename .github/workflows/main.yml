@@ -13,6 +13,8 @@ jobs:
           php-version: '7.2'
           php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
 
+      - run: export COMPOSER_MEMORY_LIMIT=-1
+
       - name: "Cancel other workflows"
         uses: potiuk/cancel-workflow-runs@master
         with:
@@ -20,7 +22,7 @@ jobs:
           cancelFutureDuplicates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           workflowFileName: main.yml
-          
+
       - name: Install project dependencies
         uses: php-actions/composer@v6
         with:
@@ -28,7 +30,7 @@ jobs:
           php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
           ssh_key: ${{ secrets.ssh_key }}
           ssh_key_pub: ${{ secrets.ssh_key_pub }}
-          
+
       - name: Convert concrete5 installation
         run: |
           php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -70,6 +72,11 @@ jobs:
                   die(1);
               }
           }
+
+          \$classLoader = new \Symfony\Component\ClassLoader\Psr4ClassLoader();
+          \$classLoader->addPrefix('Application\\\\', DIR_APPLICATION . '/' . DIRNAME_CLASSES . '/');
+          \$classLoader->addPrefix('Application\\\\Redis\\\\', DIR_APPLICATION . '/' . DIRNAME_CLASSES . '/Redis');
+          \$classLoader->register();
           EOF
           rm -rf deploy_data/application/files/*
           rm -rf deploy_data/application/config/generated_overrides/*
@@ -84,8 +91,8 @@ jobs:
           zip -r build.zip ./*
           mv build.zip ..
           cd ..
-          rm -rf deploy_data
-      
+          rm ./deploy_data/public/application/config/concrete.php
+
       - name: Deploy ZIP archive to bitter.de
         run: |
           curl -i -X POST -H "Content-Type: multipart/form-data" -F \
@@ -95,19 +102,13 @@ jobs:
             'file=@build.zip' \
             https://www.bitter.de/api/v1/addons/update/professioneller_shop
 
-      - name: Clean up 2
-        run: |
-          mkdir demo_site
-          mv build.zip demo_site/
-
       - name: Deploy to production
         uses: burnett01/rsync-deployments@4.1
         with:
           switches: -avzr --ignore-errors
-          path: ./demo_site
+          path: ./deploy_data/
           remote_port: 22
-          remote_path: /var/www/html/professional-shop.demo.bitter.de/
+          remote_path: /var/www/html/test/
           remote_host: bitter.de
           remote_user: ec2-user
           remote_key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
-

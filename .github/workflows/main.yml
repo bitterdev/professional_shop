@@ -107,7 +107,7 @@ jobs:
           switches: -avzr --ignore-errors
           path: ./deploy_data/
           remote_port: 22
-          remote_path: /var/www/html/test/
+          remote_path: /var/www/html/professional-shop.demo.bitter.de/
           remote_host: bitter.de
           remote_user: ec2-user
           remote_key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}

@@ -99,24 +99,15 @@ jobs:
         run: |
           mkdir demo_site
           mv build.zip demo_site/
-          
-      - name: Deploy ZIP archive to demo site
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
-        with:
-          server: hosting136920.a2e46.netcup.net
-          username: ${{ secrets.NETCUP_FTP_USERNAME }}
-          password: ${{ secrets.NETCUP_FTP_PASSWORD }}
-          local-dir: ./demo_site/
-          server-dir: /
 
-      - name: Extract ZIP archive on demo site
-        uses: appleboy/ssh-action@master
+      - name: Deploy to production
+        uses: burnett01/rsync-deployments@4.1
         with:
-          host: "91.204.46.70"
-          username: "hosting136920"
-          key: ${{ secrets.NETCUP_SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            cd /professional-shop.demo.bitter.de
-            unzip -o build.zip
-            rm build.zip
+          switches: -avzr --ignore-errors
+          path: ./demo_site
+          remote_port: 22
+          remote_path: /var/www/html/professional-shop.demo.bitter.de/
+          remote_host: bitter.de
+          remote_user: ec2-user
+          remote_key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}
+

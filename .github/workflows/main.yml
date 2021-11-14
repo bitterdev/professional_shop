@@ -90,7 +90,7 @@ jobs:
           zip -r build.zip ./*
           mv build.zip ..
           cd ..
-          rm ./deploy_data/public/application/config/concrete.php
+          rm -f ./deploy_data/public/application/config/concrete.php
 
       - name: Deploy ZIP archive to bitter.de
         run: |

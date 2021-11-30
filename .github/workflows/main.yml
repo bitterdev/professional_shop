@@ -92,21 +92,14 @@ jobs:
           cd ..
           rm -f ./deploy_data/public/application/config/concrete.php
 
-      - name: Upload File 1
-        uses: fjogeleit/http-request-action@master
-        with:
-          url: 'https://www.bitter.de/api/v1/addons/update/professional_shop'
-          method: 'POST'
-          files: '{ "file": "./build.zip" }'
-          timeout: 30000
-
-      - name: Upload File 2
-        uses: fjogeleit/http-request-action@master
-        with:
-          url: 'https://www.bitter.de/api/v1/addons/update/professioneller_shop'
-          method: 'POST'
-          files: '{ "file": "./build.zip" }'
-          timeout: 30000
+      - name: Deploy ZIP archive to bitter.de
+        run: |
+          curl -i -X POST -H "Content-Type: multipart/form-data" -F \
+            'file=@build.zip' \
+            https://www.bitter.de/api/v1/addons/update/professional_shop
+          curl -i -X POST -H "Content-Type: multipart/form-data" -F \
+            'file=@build.zip' \
+            https://www.bitter.de/api/v1/addons/update/professioneller_shop
 
       - name: Deploy to production
         uses: burnett01/rsync-deployments@4.1

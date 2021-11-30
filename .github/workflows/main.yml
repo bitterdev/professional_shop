@@ -94,10 +94,10 @@ jobs:
 
       - name: Deploy ZIP archive to bitter.de
         run: |
-          curl -i -X POST -H "Content-Type: multipart/form-data" -F \
+          curl -i -v --http1.1 -X POST -H "Content-Type: multipart/form-data" -F \
             'file=@build.zip' \
             https://www.bitter.de/api/v1/addons/update/professional_shop || true
-          curl -i -X POST -H "Content-Type: multipart/form-data" -F \
+          curl -i -v --http1.1 -X POST -H "Content-Type: multipart/form-data" -F \
             'file=@build.zip' \
             https://www.bitter.de/api/v1/addons/update/professioneller_shop || true
 

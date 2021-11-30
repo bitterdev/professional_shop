@@ -92,19 +92,19 @@ jobs:
           cd ..
           rm -f ./deploy_data/public/application/config/concrete.php
 
-      - name: Upload File
-        id: upload1
-        uses: JantHsueh/upload-file-action@master
+      - name: Upload File 1
+        uses: fjogeleit/http-request-action@master
         with:
-          url: https://www.bitter.de/api/v1/addons/update/professional_shop
-          fileForms: '{"file":"build.zip"}'
+          url: 'https://www.bitter.de/api/v1/addons/update/professional_shop'
+          method: 'POST'
+          files: '{ "file": "${{ github.workspace }}/build.zip" }'
 
-      - name: Upload File
-        id: upload2
-        uses: JantHsueh/upload-file-action@master
+      - name: Upload File 2
+        uses: fjogeleit/http-request-action@master
         with:
-          url: https://www.bitter.de/api/v1/addons/update/professioneller_shop
-          fileForms: '{"file":"build.zip"}'
+          url: 'https://www.bitter.de/api/v1/addons/update/professioneller_shop'
+          method: 'POST'
+          files: '{ "file": "${{ github.workspace }}/build.zip" }'
 
       - name: Deploy to production
         uses: burnett01/rsync-deployments@4.1

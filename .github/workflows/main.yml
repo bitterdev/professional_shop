@@ -91,8 +91,20 @@ jobs:
           mv build.zip ..
           cd ..
           rm -f ./deploy_data/public/application/config/concrete.php
-          curl -i -X POST -H "Content-Type: multipart/form-data" -F 'file=@build.zip' https://www.bitter.de/api/v1/addons/update/professional_shop || true
-          curl -i -X POST -H "Content-Type: multipart/form-data" -F 'file=@build.zip' https://www.bitter.de/api/v1/addons/update/professioneller_shop || true
+
+      - name: Upload File
+        id: upload1
+        uses: JantHsueh/upload-file-action@master
+        with:
+          url: https://www.bitter.de/api/v1/addons/update/professional_shop
+          fileForms: '{"file":"build.zip"}'
+
+      - name: Upload File
+        id: upload2
+        uses: JantHsueh/upload-file-action@master
+        with:
+          url: https://www.bitter.de/api/v1/addons/update/professioneller_shop
+          fileForms: '{"file":"build.zip"}'
 
       - name: Deploy to production
         uses: burnett01/rsync-deployments@4.1

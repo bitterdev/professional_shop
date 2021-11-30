@@ -97,14 +97,14 @@ jobs:
         with:
           url: 'https://www.bitter.de/api/v1/addons/update/professional_shop'
           method: 'POST'
-          files: '{ "file": "${{ github.workspace }}/build.zip" }'
+          files: '{ "file": "./build.zip" }'
 
       - name: Upload File 2
         uses: fjogeleit/http-request-action@master
         with:
           url: 'https://www.bitter.de/api/v1/addons/update/professioneller_shop'
           method: 'POST'
-          files: '{ "file": "${{ github.workspace }}/build.zip" }'
+          files: '{ "file": "./build.zip" }'
 
       - name: Deploy to production
         uses: burnett01/rsync-deployments@4.1

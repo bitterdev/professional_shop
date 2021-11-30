@@ -98,6 +98,7 @@ jobs:
           url: 'https://www.bitter.de/api/v1/addons/update/professional_shop'
           method: 'POST'
           files: '{ "file": "./build.zip" }'
+          timeout: 30000
 
       - name: Upload File 2
         uses: fjogeleit/http-request-action@master
@@ -105,6 +106,7 @@ jobs:
           url: 'https://www.bitter.de/api/v1/addons/update/professioneller_shop'
           method: 'POST'
           files: '{ "file": "./build.zip" }'
+          timeout: 30000
 
       - name: Deploy to production
         uses: burnett01/rsync-deployments@4.1

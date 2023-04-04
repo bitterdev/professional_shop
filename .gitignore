@@ -1,0 +1,24 @@
+# Ignore composer stuff
+/vendor/
+
+# Ignore concrete5 stuff
+/public/concrete
+/public/application/files
+
+# Ignore composer packages
+/public/packages/concrete_cms_theme
+/public/packages/community_badges
+
+# Ignore build files
+/public/application/css/main.css
+/public/application/js/hosting.js.LICENSE.txt
+
+# Ignore developer stuff
+/.idea
+/node_modules
+/.env
+/public/mix-manifest.json
+/phpunit.xml
+/build
+/.phpunit.*
+.DS_Store

@@ -1,0 +1,113 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  repository_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nanasess/setup-php@master
+        with:
+          php-version: '7.2'
+          php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
+
+      - run: export COMPOSER_MEMORY_LIMIT=-1
+
+      - name: "Cancel other workflows"
+        uses: potiuk/cancel-workflow-runs@master
+        with:
+          cancelMode: allDuplicates
+          cancelFutureDuplicates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflowFileName: main.yml
+
+      - name: Install project dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: 7.2
+          php_extensions: gd zip bcmath dom iconv mbstring curl mcrypt
+          ssh_key: ${{ secrets.ssh_key }}
+          ssh_key_pub: ${{ secrets.ssh_key_pub }}
+
+      - name: Convert concrete5 installation
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php
+          php -r "unlink('composer-setup.php');"
+          rm -rf deploy_data
+          mkdir deploy_data
+          cp -R public/* deploy_data/
+          cp -R vendor deploy_data/concrete/
+          rm -rf deploy_data/packages/*
+          mv deploy_data/concrete/vendor/bitterdev/* deploy_data/packages
+          cd deploy_data/packages
+          for f in *; do
+              if [ -d "$f" ]; then
+                  cd $f
+                  php ../../../composer.phar install
+                  cd ..
+              fi
+          done
+          cd ..
+          cd ..
+          cat << EOF > deploy_data/application/bootstrap/autoload.php
+          <?php
+
+          defined('C5_EXECUTE') or die('Access Denied.');
+
+          /*
+           * ----------------------------------------------------------------------------
+           * Load all composer autoload items.
+           * ----------------------------------------------------------------------------
+           */
+
+          // If the checker class is already provided, likely we have been included in a separate composer project
+          if (!class_exists(\DoctrineXml\Checker::class)) {
+              // Otherwise, lets try to load composer ourselves
+              if (!@include(DIR_BASE_CORE . '/' . DIRNAME_VENDOR . '/autoload.php')) {
+                  echo 'Third party libraries not installed. Make sure that composer has required libraries in the concrete/ directory.';
+                  die(1);
+              }
+          }
+
+          \$classLoader = new \Symfony\Component\ClassLoader\Psr4ClassLoader();
+          \$classLoader->addPrefix('Application\\\\', DIR_APPLICATION . '/' . DIRNAME_CLASSES . '/');
+          \$classLoader->addPrefix('Application\\\\Redis\\\\', DIR_APPLICATION . '/' . DIRNAME_CLASSES . '/Redis');
+          \$classLoader->register();
+          EOF
+          rm -rf deploy_data/application/files/*
+          rm -rf deploy_data/application/config/generated_overrides/*
+          find deploy_data -name ".DS_Store" -delete
+          find deploy_data -name ".gitignore" -delete
+          find deploy_data -name ".git" -type d -empty -delete
+          find deploy_data -name ".htaccess" -delete
+          rm -rf deploy_data/vendor
+          cd deploy_data/concrete
+          php ../../composer.phar install
+          cd ..
+          zip -r build.zip ./*
+          mv build.zip ..
+          cd ..
+          rm -f ./deploy_data/public/application/config/concrete.php
+
+      - name: Deploy ZIP archive to bitter.de
+        run: |
+          curl -i -X POST -H "Content-Type: multipart/form-data" -F \
+            'file=@build.zip' \
+            https://www.bitter.de/api/v1/addons/update/professional_shop
+          curl -i -X POST -H "Content-Type: multipart/form-data" -F \
+            'file=@build.zip' \
+            https://www.bitter.de/api/v1/addons/update/professioneller_shop
+
+      - name: Deploy to production
+        uses: burnett01/rsync-deployments@4.1
+        with:
+          switches: -avzr --ignore-errors
+          path: ./deploy_data/
+          remote_port: 22
+          remote_path: /var/www/html/professional-shop.demo.bitter.de/
+          remote_host: bitter.de
+          remote_user: ec2-user
+          remote_key: ${{ secrets.PRODUCTION_SSH_PRIVATE_KEY }}

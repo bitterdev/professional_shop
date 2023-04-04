@@ -1,0 +1,78 @@
+{
+  "name": "bitterdev/professional_shop",
+  "description": "Starting point package to install a professional shop.",
+  "type": "project",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "concrete5/dependency-patches": "^1.4.0",
+    "vlucas/phpdotenv": "^2.4",
+    "doctrine/dbal": "<2.11",
+    "composer/installers": "dev-main",
+    "concrete5/core": "8.5.7",
+    "bitterdev/bitter_shop_system": "dev-master",
+    "bitterdev/bitter_theme": "dev-master",
+    "setasign/fpdi": "^2.3",
+    "setasign/fpdf": "^1.8",
+    "sofort/sofortlib-php": "3.*",
+    "paypal/rest-api-sdk-php": "^1.14",
+    "ext-simplexml": "*",
+    "ext-json": "*",
+    "symfony/property-access": "^5.3",
+    "gajus/dindent": "^2.0"
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages" : true,
+    "platform" : {
+      "php" : "7.2.5"
+    }
+  },
+  "extra": {
+    "allow-subpatches": [
+      "concrete5/dependency-patches"
+    ],
+    "installer-paths": {
+      "public/concrete": ["type:concrete5-core"],
+      "public/application/themes/{$name}": ["type:concrete5-theme"],
+      "public/packages/{$name}": ["type:concrete5-package"],
+      "public/application/blocks/{$name}": ["type:concrete5-block"]
+    }
+  },
+  "repositories": {
+    "bitter_shop_system": {
+      "type": "package",
+      "package": {
+        "name": "bitterdev/bitter_shop_system",
+        "version": "dev-master",
+        "source": {
+          "url": "git@github.com:bitterdev/bitter_shop_system.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
+    },
+    "bitter_theme": {
+      "type": "package",
+      "package": {
+        "name": "bitterdev/bitter_theme",
+        "version": "dev-master",
+        "source": {
+          "url": "git@github.com:bitterdev/bitter_theme.git",
+          "type": "git",
+          "reference": "master"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system",
+      "ln -sf ../../vendor/bitterdev/bitter_theme public/packages/bitter_theme"
+    ],
+    "post-install-cmd": [
+      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system",
+      "ln -sf ../../vendor/bitterdev/bitter_theme public/packages/bitter_theme"
+    ]
+  }
+}

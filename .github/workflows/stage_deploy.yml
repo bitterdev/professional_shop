@@ -103,6 +103,7 @@ jobs:
             php ./public/concrete/bin/concrete5 c5:config set concrete.seo.canonical_url_alternative "http://professional-shop.stage.bitter.de"
             php ./public/concrete/bin/concrete5 c5:config set site.site.default.seo.canonical_url "https://professional-shop.stage.bitter.de"
             php ./public/concrete/bin/concrete5 c5:config set site.site.default.seo.canonical_url_alternative "http://professional-shop.stage.bitter.de"
+            php -d memory_limit=512M ./public/concrete/bin/concrete5 task:generate-thumbnails
             cat << EOF > ./public/.htaccess
             RewriteEngine On
             RewriteBase /

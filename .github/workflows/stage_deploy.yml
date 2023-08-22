@@ -75,7 +75,7 @@ jobs:
             mysql -h 10.35.232.98 --port 3306 -u $STAGE_DATABASE_USERNAME -p$STAGE_DATABASE_PASSWORD -e "DROP DATABASE k53075_professional_shop;"
             mysql -h 10.35.232.98 --port 3306 -u $STAGE_DATABASE_USERNAME -p$STAGE_DATABASE_PASSWORD -e "CREATE DATABASE k53075_professional_shop CHARACTER SET utf8mb4;"
             chmod +x ./public/concrete/bin/concrete5
-            php ./public/concrete/bin/concrete5 c5:install \
+            php -d memory_limit=512M ./public/concrete/bin/concrete5 c5:install \
                 --db-server=10.35.232.98:3306 \
                 --db-username=$STAGE_DATABASE_USERNAME \
                 --db-password=$STAGE_DATABASE_PASSWORD \
@@ -97,7 +97,7 @@ jobs:
             php ./public/concrete/bin/concrete5 c5:config set concrete.email.form_block.address "no-reply@bitter.de"
             php ./public/concrete/bin/concrete5 c5:config set concrete.email.validate_registration.address "no-reply@bitter.de"
             php ./public/concrete/bin/concrete5 c5:config set concrete.email.forgot_password.address "no-reply@bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.email.default.name "Demo Booking Portal"
+            php ./public/concrete/bin/concrete5 c5:config set concrete.email.default.name "Demo Site"
             php ./public/concrete/bin/concrete5 c5:config set concrete.seo.url_rewriting true
             php ./public/concrete/bin/concrete5 c5:config set concrete.seo.canonical_url "https://professional-shop.stage.bitter.de"
             php ./public/concrete/bin/concrete5 c5:config set concrete.seo.canonical_url_alternative "http://professional-shop.stage.bitter.de"
@@ -129,7 +129,7 @@ jobs:
             return [
                 'sites' => [
                     'default' => [
-                        'name' => 'Booking Portal Demo',
+                        'name' => 'Demo Site',
                         'seo' => [
                             'canonical_url' => 'https://professional-shop.stage.bitter.de/',
                             'canonical_url_alternative' => 'http://professional-shop.stage.bitter.de/',

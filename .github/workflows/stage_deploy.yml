@@ -84,8 +84,8 @@ jobs:
                 --admin-email=fabian@bitter.de \
                 --starting-point=professional_shop \
                 --site "professional-shop.com" \
-                --language de_DE \
-                --site-locale de_DE
+                --language en_US \
+                --site-locale en_US
             php ./public/concrete/bin/concrete5 c5:config set concrete.security.session.invalidate_on_ip_mismatch false
             php ./public/concrete/bin/concrete5 c5:config set concrete.mail.method "smtp"
             php ./public/concrete/bin/concrete5 c5:config set concrete.mail.methods.smtp.server "smtp.sendgrid.net"
@@ -142,3 +142,28 @@ jobs:
                 ],
             ];
             EOF
+            cat << EOF > ./public/application/config/site.php
+            <?php
+
+            return [
+                'sites' => [
+                    'default' => [
+                        'seo' => [
+                            'tracking' => [
+                                'code' => [
+                                    'header' => '',
+                                    'footer' => '<!-- Google tag (gtag.js) -->
+                                    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HEM4NQ6ZSG" type="text/plain" data-cookiecategory="analytics"></script>
+                                    <script>
+                                    window.dataLayer = window.dataLayer || [];
+                                    function gtag(){dataLayer.push(arguments);}
+                                    gtag(\'js\', new Date());
+                                    
+                                    gtag(\'config\', \'G-HEM4NQ6ZSG\');
+                                    </script>',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            ];

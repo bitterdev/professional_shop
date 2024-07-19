@@ -10,6 +10,21 @@ jobs:
         with:
           persist-credentials: false
 
+      - run: export COMPOSER_MEMORY_LIMIT=-1
+
+      - name: PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1.11"
+          extensions: json gd zip bcmath dom iconv mbstring curl mcrypt simplexml ctype tokenizer pcre intl pdo_mysql
+
+      - name: Composer
+        uses: ramsey/composer-install@v2
+        with:
+          ignore-cache: "yes"
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.COMPOSER_AUTH }}"}}'
+
       - name: Deploy to production server
         uses: burnett01/rsync-deployments@4.1
         with:
@@ -17,6 +32,6 @@ jobs:
           path: /
           remote_port: 22
           remote_path: /var/www/professional-shop.stage.bitter.de/
-          remote_host: stage.bitter.de
+          remote_host: srv565580.hstgr.cloud
           remote_user: root
           remote_key: ${{ secrets.SSH_KEY }}

@@ -12,12 +12,6 @@ jobs:
 
       - run: export COMPOSER_MEMORY_LIMIT=-1
 
-      - name: PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.1.11"
-          extensions: json gd zip bcmath dom iconv mbstring curl mcrypt simplexml ctype tokenizer pcre intl pdo_mysql
-
       - name: Composer
         uses: ramsey/composer-install@v2
         with:

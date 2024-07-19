@@ -10,7 +10,7 @@
     "bitterdev/bitter_shop_system": "dev-master",
     "bitterdev/bitter_theme": "dev-master",
     "composer/installers": "^1.3",
-    "concrete5/core": "dev-develop as 9.x-dev",
+    "concrete5/core": "9.3.x",
     "concrete5/dependency-patches": "^1.6.1",
     "gajus/dindent": "^2.0",
     "paypal/rest-api-sdk-php": "^1.14",

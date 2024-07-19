@@ -1,169 +1,22 @@
-name: Stage Deploy
+name: Production Deploy
 on:
   push:
     branches: [stage, main]
 jobs:
-  web-deploy:
-    name: Deploy
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest code
-        uses: actions/checkout@v3
-
-      - run: export COMPOSER_MEMORY_LIMIT=-1
-
-      - name: PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@v2
         with:
-          php-version: "8.1.11"
-          extensions: json gd zip bcmath dom iconv mbstring curl mcrypt simplexml ctype tokenizer pcre intl pdo_mysql
+          persist-credentials: false
 
-      - name: Composer
-        uses: ramsey/composer-install@v2
+      - name: Deploy to production server
+        uses: burnett01/rsync-deployments@4.1
         with:
-          ignore-cache: "yes"
-        env:
-          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.COMPOSER_AUTH }}"}}'
-
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r professional_shop.zip ./
-
-      - run: mkdir deploy && mv professional_shop.zip deploy/professional_shop.zip
-
-      - name: Reset system
-        uses: appleboy/ssh-action@master
-        with:
-          host: hosting179576.ae861.netcup.net
-          username: hosting179576
-          key: ${{ secrets.ssh_key }}
-          port: 22
-          script: |
-            cd /professional-shop.stage.bitter.de/httpdocs/
-            rm -rf ./*
-
-      - name: Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: hosting179576.ae861.netcup.net
-          username: professional_shop
-          password: ${{ secrets.ftp_password }}
-          local-dir: "./deploy/"
-
-      - name: Install system
-        uses: appleboy/ssh-action@master
-        env:
-          STAGE_CMS_ADMIN_PASSWORD: ${{ secrets.STAGE_CMS_ADMIN_PASSWORD }}
-          STAGE_DATABASE_PASSWORD: ${{ secrets.STAGE_DATABASE_PASSWORD }}
-          STAGE_DATABASE_USERNAME: ${{ secrets.STAGE_DATABASE_USERNAME }}
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-        with:
-          host: hosting179576.ae861.netcup.net
-          username: hosting179576
-          key: ${{ secrets.ssh_key }}
-          port: 22
-          script: |
-            cd /professional-shop.stage.bitter.de/httpdocs/
-            unzip professional_shop.zip
-            rm professional_shop.zip
-            export STAGE_CMS_ADMIN_PASSWORD="${{ secrets.STAGE_CMS_ADMIN_PASSWORD }}"
-            export STAGE_DATABASE_PASSWORD="${{ secrets.STAGE_DATABASE_PASSWORD }}"
-            export STAGE_DATABASE_USERNAME="${{ secrets.STAGE_DATABASE_USERNAME }}"
-            export SENDGRID_API_KEY="${{ secrets.SENDGRID_API_KEY }}"
-            mkdir -p public/application/files
-            chmod -R 777 public/application/files public/application/config/ public/packages/
-            mysql -h 10.35.232.98 --port 3306 -u $STAGE_DATABASE_USERNAME -p$STAGE_DATABASE_PASSWORD -e "DROP DATABASE k53075_professional_shop;"
-            mysql -h 10.35.232.98 --port 3306 -u $STAGE_DATABASE_USERNAME -p$STAGE_DATABASE_PASSWORD -e "CREATE DATABASE k53075_professional_shop CHARACTER SET utf8mb4;"
-            chmod +x ./public/concrete/bin/concrete5
-            php -d memory_limit=512M ./public/concrete/bin/concrete5 c5:install \
-                --db-server=10.35.232.98:3306 \
-                --db-username=$STAGE_DATABASE_USERNAME \
-                --db-password=$STAGE_DATABASE_PASSWORD \
-                --db-database=k53075_professional_shop \
-                --admin-password=$STAGE_CMS_ADMIN_PASSWORD \
-                --admin-email=fabian@bitter.de \
-                --starting-point=professional_shop \
-                --site "professional-shop.com" \
-                --language en_US \
-                --site-locale en_US
-            php ./public/concrete/bin/concrete5 c5:config set concrete.security.session.invalidate_on_ip_mismatch false
-            php ./public/concrete/bin/concrete5 c5:config set concrete.mail.method "smtp"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.mail.methods.smtp.server "smtp.sendgrid.net"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.mail.methods.smtp.username "apikey"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.mail.methods.smtp.password $SENDGRID_API_KEY
-            php ./public/concrete/bin/concrete5 c5:config set concrete.mail.methods.smtp.port "465"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.mail.methods.smtp.encryption "SSL"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.email.default.address "no-reply@bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.email.form_block.address "no-reply@bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.email.validate_registration.address "no-reply@bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.email.forgot_password.address "no-reply@bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.email.default.name "Demo Site"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.seo.url_rewriting true
-            php ./public/concrete/bin/concrete5 c5:config set concrete.seo.canonical_url "https://professional-shop.stage.bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.seo.canonical_url_alternative "http://professional-shop.stage.bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set site.site.default.seo.canonical_url "https://professional-shop.stage.bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set site.site.default.seo.canonical_url_alternative "http://professional-shop.stage.bitter.de"
-            php -d memory_limit=512M ./public/concrete/bin/concrete5 task:generate-thumbnails
-            cat << EOF > ./public/.htaccess
-            RewriteEngine On
-            RewriteBase /
-            RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteCond %{REQUEST_FILENAME}/index.html !-f
-            RewriteCond %{REQUEST_FILENAME}/index.php !-f
-            RewriteRule . index.php [L]
-            EOF
-            mysql -h 10.35.232.98 --port 3306 -u $STAGE_DATABASE_USERNAME -p$STAGE_DATABASE_PASSWORD -e "UPDATE k53075_professional_shop.btCheckout SET displayCaptcha = 0;"
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.display_prices_including_tax
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.notification_mail_address "fabian@bitter.de"
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.money_formatting.currency_symbol "€"
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.money_formatting.currency_code "EUR"
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.money_formatting.currency_symbol_position "right"
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.money_formatting.currency_symbol_spaces 1
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.money_formatting.decimals 2
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.money_formatting.decimal_point ","
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.money_formatting.thousands_separator "."
-            php ./public/concrete/bin/concrete5 c5:config set bitter_shop_system.payment_providers.paypal.selected_mode "sandbox"
-            php ./public/concrete/bin/concrete5 c5:config set concrete.cache.doctrine_dev_mode true
-            cat << EOF > ./public/application/config/generated_overrides/site.php
-            <?php
-
-            return [
-                'sites' => [
-                    'default' => [
-                        'name' => 'Demo Site',
-                        'seo' => [
-                            'canonical_url' => 'https://professional-shop.stage.bitter.de/',
-                            'canonical_url_alternative' => 'http://professional-shop.stage.bitter.de/',
-                            'canonical_tag' => [
-                                'enabled' => true,
-                            ],
-                        ],
-                    ],
-                ],
-            ];
-            EOF
-            cat << EOF > ./public/application/config/site.php
-            <?php
-
-            return [
-                'sites' => [
-                    'default' => [
-                        'seo' => [
-                            'tracking' => [
-                                'code' => [
-                                    'header' => '',
-                                    'footer' => '<!-- Google tag (gtag.js) -->
-                                    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HEM4NQ6ZSG" type="text/plain" data-cookiecategory="analytics"></script>
-                                    <script>
-                                    window.dataLayer = window.dataLayer || [];
-                                    function gtag(){dataLayer.push(arguments);}
-                                    gtag(\'js\', new Date());
-                                    
-                                    gtag(\'config\', \'G-HEM4NQ6ZSG\');
-                                    </script>',
-                                ],
-                            ],
-                        ],
-                    ],
-                ]
-            ];
+          switches: -avzr --ignore-errors
+          path: /
+          remote_port: 22
+          remote_path: /var/www/professional-shop.stage.bitter.de/
+          remote_host: stage.bitter.de
+          remote_user: root
+          remote_key: ${{ secrets.SSH_KEY }}

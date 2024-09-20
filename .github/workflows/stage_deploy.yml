@@ -25,7 +25,7 @@ jobs:
           switches: -avzr --ignore-errors
           path: /
           remote_port: 65002
-          remote_path: /home/u187151543/domains/demo.bitter.de/public_html
+          remote_path: /home/u187151543/domains/demo.bitter.de
           remote_host: 213.130.145.194
           remote_user: u187151543
           remote_key: ${{ secrets.SSH_KEY }}

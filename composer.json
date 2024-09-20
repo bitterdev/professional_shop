@@ -38,16 +38,16 @@
       "concrete5/dependency-patches"
     ],
     "installer-paths": {
-      "public/concrete": [
+      "public_html/concrete": [
         "type:concrete5-core"
       ],
-      "public/application/themes/{$name}": [
+      "public_html/application/themes/{$name}": [
         "type:concrete5-theme"
       ],
-      "public/packages/{$name}": [
+      "public_html/packages/{$name}": [
         "type:concrete5-package"
       ],
-      "public/application/blocks/{$name}": [
+      "public_html/application/blocks/{$name}": [
         "type:concrete5-block"
       ]
     }
@@ -80,12 +80,12 @@
   },
   "scripts": {
     "post-update-cmd": [
-      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system",
-      "ln -sf ../../vendor/bitterdev/bitter_theme public/packages/bitter_theme"
+      "ln -sf ../../vendor/bitterdev/bitter_shop_system public_html/packages/bitter_shop_system",
+      "ln -sf ../../vendor/bitterdev/bitter_theme public_html/packages/bitter_theme"
     ],
     "post-install-cmd": [
-      "ln -sf ../../vendor/bitterdev/bitter_shop_system public/packages/bitter_shop_system",
-      "ln -sf ../../vendor/bitterdev/bitter_theme public/packages/bitter_theme"
+      "ln -sf ../../vendor/bitterdev/bitter_shop_system public_html/packages/bitter_shop_system",
+      "ln -sf ../../vendor/bitterdev/bitter_theme public_html/packages/bitter_theme"
     ]
   }
 }

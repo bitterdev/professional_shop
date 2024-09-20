@@ -24,8 +24,8 @@ jobs:
         with:
           switches: -avzr --ignore-errors
           path: /
-          remote_port: 22
-          remote_path: /var/www/professional-shop.demo.bitter.de/
-          remote_host: srv565580.hstgr.cloud
-          remote_user: root
+          remote_port: 65002
+          remote_path: /home/u187151543/domains/demo.bitter.de/public_html
+          remote_host: 213.130.145.194
+          remote_user: u187151543
           remote_key: ${{ secrets.SSH_KEY }}
